@@ -72,6 +72,14 @@ export default function PostPage({ params }: PostPageProps) {
 
   return (
     <article className="container mx-auto px-4 py-8">
+      {/* Affichage de l'image principale */}
+      {post.featuredImage && (
+        <img
+          src={post.featuredImage}
+          alt={post.title}
+          className="mb-8 w-full max-h-96 object-cover rounded"
+        />
+      )}
       <header className="mb-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-gray-500">

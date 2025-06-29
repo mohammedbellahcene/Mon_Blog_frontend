@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { posts, themes } from '@/lib/api';
 import type { PostCreateRequest, PostStatus, Theme } from '@/types/api';
 import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 const postSchema = z.object({
   title: z.string()
@@ -30,6 +30,10 @@ export default function NewPostPage() {
   const [themesList, setThemesList] = useState<Theme[]>([]);
   const [themesError, setThemesError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imageUrl, setImageUrl] = useState('');
   
   const { register, handleSubmit, formState: { errors }, setError } = useForm<FormData>({
     resolver: zodResolver(postSchema),
@@ -60,6 +64,18 @@ export default function NewPostPage() {
     loadThemes();
   }, []);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImageUrl(e.target.value);
+    setImagePreview(e.target.value);
+  };
+
   const onSubmit = async (data: FormData) => {
     console.log('Session username:', session?.username);
     if (!session?.username || session.username.includes('@')) {
@@ -80,11 +96,34 @@ export default function NewPostPage() {
         return;
       }
 
+      let featuredImage = '';
+      // Si un fichier est sélectionné, upload
+      const file = fileInputRef.current?.files?.[0];
+      if (file) {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await fetch('http://localhost:8080/api/files/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await response.json();
+        featuredImage = result.url
+          ? result.url
+          : result.filename
+            ? `http://localhost:8080/files/${result.filename}`
+            : '';
+        setUploading(false);
+      } else if (imageUrl) {
+        featuredImage = imageUrl;
+      }
+
       const postData: any = {
         title: data.title,
         content: data.content,
         themeId: parseInt(data.themeId),
         status: data.status,
+        featuredImage,
       };
       const tags = data.tagsString.split(',').map(tag => tag.trim()).filter(Boolean);
       if (tags.length > 0) postData.tags = tags;
@@ -98,6 +137,8 @@ export default function NewPostPage() {
         type: 'manual',
         message: 'Erreur lors de la création de l\'article. Veuillez réessayer.'
       });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -208,6 +249,29 @@ export default function NewPostPage() {
           <option value="PUBLISHED">Publié</option>
           <option value="SCHEDULED">Planifié</option>
         </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Image principale</label>
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleImageChange}
+          className="mt-1 block w-full"
+        />
+        <div className="mt-2 text-sm text-gray-500">Ou collez une URL d'image :</div>
+        <input
+          type="url"
+          placeholder="https://..."
+          value={imageUrl}
+          onChange={handleImageUrlChange}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+        />
+        {imagePreview && (
+          <img src={imagePreview} alt="Aperçu" className="mt-2 max-h-48 rounded" />
+        )}
+        {uploading && <div className="text-blue-600 mt-2">Envoi de l'image...</div>}
       </div>
 
       <button

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { posts, themes } from "@/lib/api";
@@ -27,6 +27,10 @@ export default function EditPostPage() {
   const [post, setPost] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [themesList, setThemesList] = useState<any[]>([]);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imageUrl, setImageUrl] = useState('');
 
   const {
     register,
@@ -47,6 +51,10 @@ export default function EditPostPage() {
         setValue("themeId", data.theme.id.toString());
         setValue("tagsString", data.tags.join(", "));
         setValue("status", data.status);
+        if (data.featuredImage) {
+          setImagePreview(data.featuredImage);
+          setImageUrl(data.featuredImage);
+        }
         if (session?.username !== data.author.username) {
           setError("Vous n'êtes pas autorisé à modifier cet article.");
         }
@@ -68,12 +76,45 @@ export default function EditPostPage() {
     fetchThemes();
   }, [params.id, session?.username, setValue]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImageUrl(e.target.value);
+    setImagePreview(e.target.value);
+  };
+
   const onSubmit = async (formData: FormData) => {
     if (!session?.accessToken) {
       toast.error("Vous devez être connecté");
       return;
     }
     try {
+      let featuredImage = post?.featuredImage || '';
+      // Si un fichier est sélectionné, upload
+      const file = fileInputRef.current?.files?.[0];
+      if (file) {
+        setUploading(true);
+        const formDataFile = new FormData();
+        formDataFile.append('file', file);
+        const response = await fetch('http://localhost:8080/api/files/upload', {
+          method: 'POST',
+          body: formDataFile,
+        });
+        const result = await response.json();
+        featuredImage = result.url
+          ? result.url
+          : result.filename
+            ? `http://localhost:8080/files/${result.filename}`
+            : '';
+        setUploading(false);
+      } else if (imageUrl) {
+        featuredImage = imageUrl;
+      }
       const tags = formData.tagsString?.split(",").map((t) => t.trim()).filter(Boolean) || [];
       await posts.update(Number(params.id), {
         title: formData.title,
@@ -81,11 +122,14 @@ export default function EditPostPage() {
         themeId: Number(formData.themeId),
         tags,
         status: formData.status,
+        featuredImage,
       });
       toast.success("Article modifié avec succès");
       router.push(`/posts/${params.id}`);
     } catch (e) {
       toast.error("Erreur lors de la modification de l'article");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -152,6 +196,28 @@ export default function EditPostPage() {
             <option value="PUBLISHED">Publié</option>
             <option value="SCHEDULED">Planifié</option>
           </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Image principale</label>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleImageChange}
+            className="mt-1 block w-full"
+          />
+          <div className="mt-2 text-sm text-gray-500">Ou collez une URL d'image :</div>
+          <input
+            type="url"
+            placeholder="https://..."
+            value={imageUrl}
+            onChange={handleImageUrlChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          />
+          {imagePreview && (
+            <img src={imagePreview} alt="Aperçu" className="mt-2 max-h-48 rounded" />
+          )}
+          {uploading && <div className="text-blue-600 mt-2">Envoi de l'image...</div>}
         </div>
         <button
           type="submit"
