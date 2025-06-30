@@ -76,6 +76,16 @@ export default function PostsPage() {
             key={post.id}
             className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
           >
+            {post.featuredImage && (
+              <div className="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden shadow-sm">
+                <img
+                  src={post.featuredImage}
+                  alt={post.title}
+                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  onError={e => { e.currentTarget.src = '/placeholder-image.png'; }}
+                />
+              </div>
+            )}
             <Link href={`/posts/${post.id}`} className="block p-6">
               <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
                 <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
