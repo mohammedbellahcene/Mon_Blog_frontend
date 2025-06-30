@@ -12,8 +12,10 @@ import type {
   Theme,
 } from '@/types/api';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: `${API_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -57,4 +59,18 @@ export const themes = {
     api.get<Theme[]>('/themes'),
   getById: (id: number) =>
     api.get<Theme>(`/themes/${id}`),
-}; 
+};
+
+export async function deletePost(id: string) {
+  const response = await fetch(`${API_URL}/posts/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete post');
+  }
+} 

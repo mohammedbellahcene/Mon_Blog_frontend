@@ -65,6 +65,9 @@ export default async function Home() {
                 <p className="mt-3 text-sm text-gray-500 line-clamp-3">
                   {post.excerpt}
                 </p>
+                <div className="text-sm text-gray-500 mt-2">
+                  {post.viewCount} vues
+                </div>
                 <div className="mt-4 flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <img
