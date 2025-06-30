@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { formatDistanceToNow } from 'date-fns';
@@ -29,6 +29,19 @@ export default function CommentSection({ postId }: CommentSectionProps) {
     formState: { errors },
   } = useForm<CommentFormData>();
 
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await comments.getByPost(postId);
+        // Selon la structure de la réponse, adapte la ligne ci-dessous :
+        setCommentList(response.data.content || response.data || []);
+      } catch (error) {
+        // Optionnel : afficher une erreur ou laisser vide
+      }
+    };
+    fetchComments();
+  }, [postId]);
+
   const onSubmit = async (data: CommentFormData) => {
     if (!session) {
       toast.error('Vous devez être connecté pour commenter');
@@ -37,9 +50,8 @@ export default function CommentSection({ postId }: CommentSectionProps) {
 
     try {
       setIsLoading(true);
-      const response = await comments.create({
+      const response = await comments.create(postId, {
         content: data.content,
-        postId,
       });
       setCommentList((prev) => [response.data, ...prev]);
       reset();
