@@ -54,6 +54,15 @@ export const comments = {
     api.delete(`/comments/${id}`),
 };
 
+export const reactions = {
+  add: (postId: number, type: 'LIKE' | 'DISLIKE') => 
+    api.post(`/reactions/posts/${postId}`, { type }),
+  delete: (postId: number) => 
+    api.delete(`/reactions/posts/${postId}`),
+  getUserReaction: (postId: number) => 
+    api.get(`/reactions/posts/${postId}/user`),
+};
+
 export const themes = {
   getAll: () =>
     api.get<Theme[]>('/themes'),

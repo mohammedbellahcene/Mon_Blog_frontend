@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import CommentSection from '@/components/CommentSection';
 import { deletePost } from '@/lib/api';
+import ReactionButtons from '@/components/ReactionButtons';
 
 type PostDetailProps = {
   post: any;
@@ -121,6 +122,14 @@ export default function PostDetail({ post }: PostDetailProps) {
 
       <div className="prose prose-lg max-w-none">
         <ReactMarkdown>{post.content}</ReactMarkdown>
+      </div>
+
+      <div className="my-8">
+        <ReactionButtons
+          postId={post.id}
+          initialLikes={post.likeCount}
+          initialDislikes={post.dislikeCount}
+        />
       </div>
 
       <hr className="my-8" />
