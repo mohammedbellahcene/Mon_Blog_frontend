@@ -45,6 +45,13 @@ export default async function Home() {
               key={post.id}
               className="overflow-hidden rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md"
             >
+              {post.featuredImage && (
+                <img
+                  src={post.featuredImage}
+                  alt={post.title}
+                  className="w-full h-48 object-contain bg-white"
+                />
+              )}
               <div className="p-6">
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
