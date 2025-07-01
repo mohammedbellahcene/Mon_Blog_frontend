@@ -131,6 +131,7 @@ export default function NewPostPage() {
 
       const response = await posts.create(postData);
       router.push(`/posts/${response.data.id}`);
+      router.refresh();
     } catch (error) {
       console.error('Erreur lors de la création:', error);
       setError('root', { 
