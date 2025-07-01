@@ -126,6 +126,7 @@ export default function EditPostPage() {
       });
       toast.success("Article modifié avec succès");
       router.push(`/posts/${params.id}`);
+      router.refresh();
     } catch (e) {
       toast.error("Erreur lors de la modification de l'article");
     } finally {
