@@ -71,15 +71,8 @@ export const themes = {
 };
 
 export async function deletePost(id: string) {
-  const response = await fetch(`${API_URL}/posts/${id}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
+  const response = await api.delete(`/posts/${id}`);
+  if (response.status !== 200 && response.status !== 204) {
     throw new Error('Failed to delete post');
   }
 } 

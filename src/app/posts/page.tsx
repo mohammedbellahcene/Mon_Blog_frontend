@@ -29,7 +29,7 @@ export default async function PostsPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {postsList.map((post: any) => (
+        {(postsList ?? []).map((post: any) => (
           <Link
             key={post.id}
             href={`/posts/${post.id}`}
@@ -58,6 +58,8 @@ export default async function PostsPage() {
               
               <div className="text-sm text-gray-500 mt-4">
                 <span>{post.viewCount} vues</span>
+                <span className="ml-4">👍 {post.likeCount} </span>
+                <span className="ml-2">👎 {post.dislikeCount}</span>
               </div>
 
               <div className="mt-4 flex items-center gap-4">

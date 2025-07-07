@@ -37,8 +37,9 @@ export default function PostDetail({ post }: PostDetailProps) {
     setIsDeleting(true);
     try {
       await deletePost(post.id);
-      router.push('/posts');
+      router.push('/');
       router.refresh();
+      return;
     } catch (error) {
       console.error('Erreur lors de la suppression:', error);
       alert("Erreur lors de la suppression de l'article");
