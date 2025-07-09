@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { posts } from '@/lib/api';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import type { Post } from "@/types/api";
 
 async function getPosts() {
   try {
@@ -40,7 +41,7 @@ export default async function Home() {
     <main className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
         <Suspense fallback={<div>Chargement des articles...</div>}>
-          {posts.map((post) => (
+          {posts.map((post: Post) => (
             <article
               key={post.id}
               className="overflow-hidden rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md"

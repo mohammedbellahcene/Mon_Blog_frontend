@@ -55,7 +55,7 @@ export default function EditPostPage() {
           setImagePreview(data.featuredImage);
           setImageUrl(data.featuredImage);
         }
-        if (session?.username !== data.author.username) {
+        if (session?.user?.username !== data.author.username) {
           setError("Vous n'êtes pas autorisé à modifier cet article.");
         }
       } catch (e) {
@@ -74,7 +74,7 @@ export default function EditPostPage() {
     };
     fetchPost();
     fetchThemes();
-  }, [params.id, session?.username, setValue]);
+  }, [params.id, session?.user?.username, setValue]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -89,7 +89,7 @@ export default function EditPostPage() {
   };
 
   const onSubmit = async (formData: FormData) => {
-    if (!session?.accessToken) {
+    if (!session?.user?.accessToken) {
       toast.error("Vous devez être connecté");
       return;
     }

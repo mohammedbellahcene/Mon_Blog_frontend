@@ -77,18 +77,18 @@ export default function NewPostPage() {
   };
 
   const onSubmit = async (data: FormData) => {
-    console.log('Session username:', session?.username);
-    if (!session?.username || session.username.includes('@')) {
+    console.log('Session username:', session?.user?.username);
+    if (!session?.user?.username || session.user.username.includes('@')) {
       setError('root', {
         type: 'manual',
-        message: "Erreur d'authentification: le username n'est pas correctement propagé. Veuillez vous reconnecter."
+        message: "Vous devez être connecté avec un nom d'utilisateur valide pour publier un article.",
       });
       return;
     }
 
     console.log('Soumission du formulaire', data);
     try {
-      if (!session?.accessToken) {
+      if (!session?.user?.accessToken) {
         setError('root', {
           type: 'manual',
           message: 'Vous devez être connecté pour créer un article'

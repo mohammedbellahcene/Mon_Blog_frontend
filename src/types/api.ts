@@ -35,6 +35,10 @@ export interface Post {
   createdAt: string;
   updatedAt: string;
   publishAt?: string;
+  featuredImage?: string;
+  featuredImageAlt?: string;
+  featuredImageCaption?: string;
+  viewCount?: number;
 }
 
 export interface Comment {
@@ -46,6 +50,7 @@ export interface Comment {
   };
   createdAt: string;
   updatedAt: string;
+  status?: string;
 }
 
 export interface LoginRequest {
