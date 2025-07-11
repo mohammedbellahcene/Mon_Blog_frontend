@@ -2,7 +2,7 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { auth } from '@/lib/api';
 
-const handler = NextAuth({
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -17,14 +17,13 @@ const handler = NextAuth({
             password: credentials?.password || '',
           });
 
-          console.log('LOGIN RESPONSE', data);
-
           return {
             id: data.user.id.toString(),
             name: data.user.username,
             username: data.user.username,
             email: data.user.email,
             accessToken: data.accessToken,
+            roles: data.user.roles,
           };
         } catch (error) {
           return null;
@@ -37,6 +36,7 @@ const handler = NextAuth({
       if (user) {
         token.accessToken = user.accessToken;
         token.username = user.username;
+        token.roles = user.roles;
       }
       return token;
     },
@@ -44,6 +44,7 @@ const handler = NextAuth({
       if (session.user) {
         session.user.accessToken = typeof token.accessToken === "string" ? token.accessToken : undefined;
         session.user.username = typeof token.username === "string" ? token.username : undefined;
+        session.user.roles = token.roles;
       }
       // Vérification côté backend
       if (session.user?.accessToken) {
@@ -69,6 +70,8 @@ const handler = NextAuth({
   session: {
     strategy: 'jwt',
   },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST }; 
