@@ -15,7 +15,10 @@ const navigation = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession({
+    required: false,
+    refetchInterval: 60, // vérifie toutes les 60 secondes
+  });
 
   return (
     <Disclosure as="nav" className="bg-white shadow">
@@ -52,12 +55,18 @@ export default function Navbar() {
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
                 {session ? (
                   <Menu as="div" className="relative ml-3">
-                    <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 relative">
                       <span className="sr-only">Ouvrir le menu utilisateur</span>
                       <img
                         className="h-8 w-8 rounded-full"
                         src={`https://ui-avatars.com/api/?name=${session.user?.name}`}
                         alt={session.user?.name || ''}
+                      />
+                      {/* Indicateur de statut de connexion */}
+                      <span
+                        className={`absolute bottom-0 right-0 block w-3 h-3 rounded-full border-2 border-white ${status === 'authenticated' ? 'bg-green-500' : 'bg-red-500'}`}
+                        title={status === 'authenticated' ? 'Connecté' : 'Déconnecté'}
+                        aria-label={status === 'authenticated' ? 'Connecté' : 'Déconnecté'}
                       />
                     </Menu.Button>
                     <Transition

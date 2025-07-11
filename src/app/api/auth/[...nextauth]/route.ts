@@ -45,6 +45,21 @@ const handler = NextAuth({
         session.user.accessToken = typeof token.accessToken === "string" ? token.accessToken : undefined;
         session.user.username = typeof token.username === "string" ? token.username : undefined;
       }
+      // Vérification côté backend
+      if (session.user?.accessToken) {
+        try {
+          const res = await fetch("http://localhost:8080/api/auth/validate", {
+            headers: {
+              Authorization: `Bearer ${session.user.accessToken}`,
+            },
+          });
+          if (!res.ok) {
+            return null;
+          }
+        } catch (e) {
+          return null;
+        }
+      }
       return session;
     }
   },
