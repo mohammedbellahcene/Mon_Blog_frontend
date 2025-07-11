@@ -15,7 +15,7 @@ import type {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 const api = axios.create({
-  baseURL: `${API_URL}/api`,
+  baseURL: `${API_URL}`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -32,46 +32,46 @@ api.interceptors.request.use(async (config) => {
 
 export const auth = {
   login: (data: { email: string; password: string }) =>
-    api.post('/auth/login', data),
+    api.post('/api/auth/login', data),
   register: (data: { username: string; email: string; password: string }) =>
-    api.post('/auth/register', data),
+    api.post('/api/auth/register', data),
 };
 
 export const posts = {
-  getAll: () => api.get('/posts/all'),
-  getById: (id: string) => api.get(`/posts/${id}`),
-  create: (data: any) => api.post('/posts', data),
-  update: (id: number, data: any) => api.put(`/posts/${id}`, data),
-  delete: (id: number) => api.delete(`/posts/${id}`),
+  getAll: () => api.get('/api/posts/all'),
+  getById: (id: string) => api.get(`/api/posts/${id}`),
+  create: (data: any) => api.post('/api/posts', data),
+  update: (id: number, data: any) => api.put(`/api/posts/${id}`, data),
+  delete: (id: number) => api.delete(`/api/posts/${id}`),
 };
 
 export const comments = {
   getByPost: (postId: number) =>
-    api.get<PaginatedResponse<Comment>>(`/posts/${postId}/comments`),
+    api.get<PaginatedResponse<Comment>>(`/api/posts/${postId}/comments`),
   create: (postId: number, data: CommentCreateRequest) =>
-    api.post<Comment>(`/posts/${postId}/comments`, data),
+    api.post<Comment>(`/api/posts/${postId}/comments`, data),
   delete: (id: number) =>
-    api.delete(`/comments/${id}`),
+    api.delete(`/api/comments/${id}`),
 };
 
 export const reactions = {
   add: (postId: number, type: 'LIKE' | 'DISLIKE') => 
-    api.post(`/reactions/posts/${postId}`, { type }),
+    api.post(`/api/reactions/posts/${postId}`, { type }),
   delete: (postId: number) => 
-    api.delete(`/reactions/posts/${postId}`),
+    api.delete(`/api/reactions/posts/${postId}`),
   getUserReaction: (postId: number) => 
-    api.get(`/reactions/posts/${postId}/user`),
+    api.get(`/api/reactions/posts/${postId}/user`),
 };
 
 export const themes = {
   getAll: () =>
-    api.get<Theme[]>('/themes'),
+    api.get<Theme[]>('/api/themes'),
   getById: (id: number) =>
-    api.get<Theme>(`/themes/${id}`),
+    api.get<Theme>(`/api/themes/${id}`),
 };
 
 export async function deletePost(id: string) {
-  const response = await api.delete(`/posts/${id}`);
+  const response = await api.delete(`/api/posts/${id}`);
   if (response.status !== 200 && response.status !== 204) {
     throw new Error('Failed to delete post');
   }
