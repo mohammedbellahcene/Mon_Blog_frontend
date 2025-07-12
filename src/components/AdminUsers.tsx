@@ -1,15 +1,13 @@
 import React from 'react';
 import useSWR, { mutate } from 'swr';
 import { useSession } from 'next-auth/react';
+import { api } from '../lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
-const fetcher = async (url: string, token?: string) => {
-  const res = await fetch(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new Error('Erreur API');
-  return res.json();
+const fetcher = async () => {
+  const res = await api.get('/api/admin/users');
+  return res.data;
 };
 
 interface UserResponse {
@@ -26,10 +24,10 @@ export default function AdminUsers() {
   const { data: session } = useSession();
   const token = session?.user?.accessToken;
   const shouldFetch = !!token;
-  const swrKey = shouldFetch ? [`${API_URL}/admin/users`, token] : null;
+  const swrKey = shouldFetch ? [`${API_URL}/api/admin/users`, token] : null;
   const { data, error, isLoading } = useSWR<{ content: UserResponse[] }>(
-    swrKey,
-    ([url, token]) => fetcher(url, token)
+    shouldFetch ? '/api/admin/users' : null,
+    fetcher
   );
 
   if (!token) return <div>Authentification requise…</div>;
@@ -47,7 +45,7 @@ export default function AdminUsers() {
   const handleDelete = async (id: number) => {
     if (!confirm("Confirmer la suppression de l'utilisateur ?")) return;
     try {
-      const res = await fetch(`${API_URL}/admin/users/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/users/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

@@ -15,7 +15,7 @@ import type {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 const api = axios.create({
-  baseURL: `${API_URL}`,
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -76,3 +76,5 @@ export async function deletePost(id: string) {
     throw new Error('Failed to delete post');
   }
 } 
+
+export { api }; 
