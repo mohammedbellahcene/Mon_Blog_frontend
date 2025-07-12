@@ -1,13 +1,12 @@
 import React from 'react';
-
-// Données mockées pour l'exemple
-const items = [
-  { id: 1, name: 'Tech', type: 'Catégorie' },
-  { id: 2, name: 'Lifestyle', type: 'Catégorie' },
-  { id: 3, name: 'Sombre', type: 'Thème' },
-];
+import useSWR from 'swr';
+import { api } from '../lib/api';
 
 export default function AdminCategoriesThemes() {
+  const fetcher = (url: string) => api.get(url).then(res => res.data);
+  const { data: categories, error: catError } = useSWR('/api/admin/categories', fetcher);
+  const { data: themes, error: themeError } = useSWR('/api/admin/themes', fetcher);
+
   const handleEdit = (id: number) => {
     alert(`Éditer ${id}`);
   };
@@ -17,6 +16,9 @@ export default function AdminCategoriesThemes() {
   const handleAdd = () => {
     alert('Ajouter une catégorie ou un thème');
   };
+
+  if (catError || themeError) return <div className="text-red-600">Erreur de chargement</div>;
+  if (!categories || !themes) return <div>Chargement...</div>;
 
   return (
     <div>
@@ -31,13 +33,23 @@ export default function AdminCategoriesThemes() {
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => (
-            <tr key={item.id} className="text-center">
-              <td className="border px-4 py-2">{item.name}</td>
-              <td className="border px-4 py-2">{item.type}</td>
+          {categories.map((cat: any) => (
+            <tr key={`cat-${cat.id}`} className="text-center">
+              <td className="border px-4 py-2">{cat.name}</td>
+              <td className="border px-4 py-2">Catégorie</td>
               <td className="border px-4 py-2 space-x-2">
-                <button className="px-2 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200" onClick={() => handleEdit(item.id)}>Éditer</button>
-                <button className="px-2 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200" onClick={() => handleDelete(item.id)}>Supprimer</button>
+                <button className="px-2 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200" onClick={() => handleEdit(cat.id)}>Éditer</button>
+                <button className="px-2 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200" onClick={() => handleDelete(cat.id)}>Supprimer</button>
+              </td>
+            </tr>
+          ))}
+          {themes.map((theme: any) => (
+            <tr key={`theme-${theme.id}`} className="text-center">
+              <td className="border px-4 py-2">{theme.name}</td>
+              <td className="border px-4 py-2">Thème</td>
+              <td className="border px-4 py-2 space-x-2">
+                <button className="px-2 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200" onClick={() => handleEdit(theme.id)}>Éditer</button>
+                <button className="px-2 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200" onClick={() => handleDelete(theme.id)}>Supprimer</button>
               </td>
             </tr>
           ))}
