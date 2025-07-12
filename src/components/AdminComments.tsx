@@ -1,13 +1,23 @@
-import React from 'react';
-
-// Données mockées pour l'exemple
-const comments = [
-  { id: 1, author: 'alice', content: 'Super article !', status: 'En attente', reports: 0 },
-  { id: 2, author: 'bob', content: 'Je ne suis pas d’accord', status: 'Validé', reports: 2 },
-  { id: 3, author: 'carol', content: 'Spam', status: 'Signalé', reports: 5 },
-];
+import React, { useState } from 'react';
+import useSWR from 'swr';
+import { api } from '../lib/api';
 
 export default function AdminComments() {
+  const [page, setPage] = useState(0);
+  const size = 10;
+
+  const fetcher = async (url: string) => {
+    const res = await api.get(url);
+    return res.data;
+  };
+  const { data, error, isLoading } = useSWR(`/api/admin/comments?page=${page}&size=${size}`, fetcher);
+
+  if (isLoading) return <div>Chargement...</div>;
+  if (error) return <div className="text-red-600">Erreur lors du chargement des commentaires.</div>;
+
+  const comments = data?.content || [];
+  const totalPages = data?.totalPages || 1;
+
   const handleValidate = (id: number) => {
     alert(`Valider commentaire ${id}`);
   };
@@ -32,12 +42,12 @@ export default function AdminComments() {
           </tr>
         </thead>
         <tbody>
-          {comments.map((comment) => (
+          {comments.map((comment: any) => (
             <tr key={comment.id} className="text-center">
-              <td className="border px-4 py-2">{comment.author}</td>
+              <td className="border px-4 py-2">{comment.author?.username || '-'}</td>
               <td className="border px-4 py-2">{comment.content}</td>
               <td className="border px-4 py-2">{comment.status}</td>
-              <td className="border px-4 py-2">{comment.reports}</td>
+              <td className="border px-4 py-2">{comment.reportCount}</td>
               <td className="border px-4 py-2 space-x-2">
                 <button className="px-2 py-1 bg-green-100 text-green-800 rounded hover:bg-green-200" onClick={() => handleValidate(comment.id)}>Valider</button>
                 <button className="px-2 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200" onClick={() => handleDelete(comment.id)}>Supprimer</button>
@@ -47,6 +57,25 @@ export default function AdminComments() {
           ))}
         </tbody>
       </table>
+      <div className="flex justify-between items-center mt-4">
+        <button
+          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+          onClick={() => setPage((p) => Math.max(0, p - 1))}
+          disabled={page === 0}
+        >
+          Précédent
+        </button>
+        <span>
+          Page {page + 1} / {totalPages}
+        </span>
+        <button
+          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+          onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+          disabled={page + 1 >= totalPages}
+        >
+          Suivant
+        </button>
+      </div>
     </div>
   );
 } 

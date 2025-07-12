@@ -1,13 +1,23 @@
-import React from 'react';
-
-// Données mockées pour l'exemple
-const posts = [
-  { id: 1, title: 'Premier post', author: 'alice', status: 'Publié', featured: false },
-  { id: 2, title: 'Brouillon secret', author: 'bob', status: 'Brouillon', featured: false },
-  { id: 3, title: 'Post en vedette', author: 'carol', status: 'Publié', featured: true },
-];
+import React, { useState } from 'react';
+import useSWR from 'swr';
+import { api } from '../lib/api';
 
 export default function AdminPosts() {
+  const [page, setPage] = useState(0);
+  const size = 10; // Nombre de posts par page
+
+  const fetcher = async (url: string) => {
+    const res = await api.get(url);
+    return res.data;
+  };
+  const { data, error, isLoading } = useSWR(`/api/admin/posts?page=${page}&size=${size}`, fetcher);
+
+  if (isLoading) return <div>Chargement...</div>;
+  if (error) return <div className="text-red-600">Erreur lors du chargement des posts.</div>;
+
+  const posts = data?.content || [];
+  const totalPages = data?.totalPages || 1;
+
   const handleEdit = (id: number) => {
     alert(`Éditer post ${id}`);
   };
@@ -31,10 +41,10 @@ export default function AdminPosts() {
           </tr>
         </thead>
         <tbody>
-          {posts.map((post) => (
+          {posts.map((post: any) => (
             <tr key={post.id} className="text-center">
               <td className="border px-4 py-2">{post.title} {post.featured && <span className="ml-2 text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded">En vedette</span>}</td>
-              <td className="border px-4 py-2">{post.author}</td>
+              <td className="border px-4 py-2">{post.author?.username || post.author || '-'}</td>
               <td className="border px-4 py-2">{post.status}</td>
               <td className="border px-4 py-2 space-x-2">
                 <button className="px-2 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200" onClick={() => handleEdit(post.id)}>Éditer</button>
@@ -45,6 +55,23 @@ export default function AdminPosts() {
           ))}
         </tbody>
       </table>
+      <div className="flex justify-center items-center mt-4 space-x-4">
+        <button
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          onClick={() => setPage((p) => Math.max(0, p - 1))}
+          disabled={page === 0}
+        >
+          Précédent
+        </button>
+        <span>Page {page + 1} / {totalPages}</span>
+        <button
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+          disabled={page + 1 >= totalPages}
+        >
+          Suivant
+        </button>
+      </div>
     </div>
   );
 } 
