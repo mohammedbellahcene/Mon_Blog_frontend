@@ -53,7 +53,7 @@ export default function AdminUsers() {
       });
       if (!res.ok) throw new Error('Erreur lors de la suppression');
       // Rafraîchir la liste
-      mutate(swrKey);
+      mutate('/api/admin/users');
     } catch (e) {
       alert("Erreur lors de la suppression");
     }

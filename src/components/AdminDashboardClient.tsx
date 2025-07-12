@@ -4,6 +4,7 @@ import AdminUsers from './AdminUsers';
 import AdminPosts from './AdminPosts';
 import AdminComments from './AdminComments';
 import AdminCategoriesThemes from './AdminCategoriesThemes';
+import Statistics from '../app/admin/statistics/page';
 
 const sections = [
   { key: 'users', label: 'Utilisateurs' },
@@ -47,7 +48,7 @@ export default function AdminDashboardClient() {
         {active === 'posts' && <AdminPosts />}
         {active === 'comments' && <AdminComments />}
         {active === 'categories-themes' && <AdminCategoriesThemes />}
-        {active === 'stats' && <div>Statistiques globales (à implémenter)</div>}
+        {active === 'stats' && <Statistics />}
         {active === 'notifications' && <div>Notifications système (à implémenter)</div>}
       </main>
     </div>
