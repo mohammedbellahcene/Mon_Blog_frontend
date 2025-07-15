@@ -40,6 +40,7 @@ export default function RegisterPage() {
         username,
         email,
         password,
+        confirmPassword: confirm,
       });
       const result = await signIn('credentials', {
         username: email,
