@@ -1,3 +1,5 @@
+'use client';
+
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
 

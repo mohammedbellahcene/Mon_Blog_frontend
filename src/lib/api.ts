@@ -34,7 +34,9 @@ export const auth = {
   login: (data: { email: string; password: string }) =>
     api.post('/api/auth/login', data),
   register: (data: { username: string; email: string; password: string }) =>
-    api.post('/api/auth/register', data),
+    api.post('/api/auth/register', data, {
+      headers: { 'Content-Type': 'application/json' }
+    }),
 };
 
 export const posts = {

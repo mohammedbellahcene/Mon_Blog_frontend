@@ -13,7 +13,7 @@ const navigation = [
   { name: 'Nouvel article', href: '/posts/new' },
 ];
 
-function isAdmin(session) {
+function isAdmin(session: any) {
   return session?.user?.roles?.includes('ROLE_ADMIN');
 }
 
@@ -21,7 +21,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const { data: session, status } = useSession({
     required: false,
-    refetchInterval: 60, // vérifie toutes les 60 secondes
   });
 
   return (
