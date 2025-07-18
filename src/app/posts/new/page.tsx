@@ -77,7 +77,11 @@ export default function NewPostPage() {
   };
 
   const onSubmit = async (data: FormData) => {
-    console.log('Session username:', session?.user?.username);
+    console.log('Session info:', {
+      username: session?.user?.username,
+      email: session?.user?.email,
+      accessToken: session?.user?.accessToken
+    });
     if (!session?.user?.username || session.user.username.includes('@')) {
       setError('root', {
         type: 'manual',

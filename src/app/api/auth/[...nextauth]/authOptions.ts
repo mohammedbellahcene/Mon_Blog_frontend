@@ -16,10 +16,11 @@ export const authOptions = {
             password: credentials?.password || '',
           });
 
+          // Correction : username = data.user.username, email = data.user.email
           return {
             id: data.user.id.toString(),
             name: data.user.username,
-            username: data.user.username,
+            username: data.user.username, // toujours le vrai username
             email: data.user.email,
             accessToken: data.accessToken,
             roles: data.user.roles,
@@ -48,7 +49,8 @@ export const authOptions = {
       // Vérification côté backend
       if (session.user?.accessToken) {
         try {
-          const res = await fetch("http://localhost:8080/api/auth/validate", {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+          const res = await fetch(`${apiUrl}/api/auth/validate`, {
             headers: {
               Authorization: `Bearer ${session.user.accessToken}`,
             },

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { posts } from '@/lib/api';
@@ -7,8 +8,8 @@ import type { Post } from "@/types/api";
 
 async function getPosts() {
   try {
-    const { data } = await posts.getAll();
-    return data;
+    const response = await posts.getAll();
+    return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error('Erreur lors de la récupération des articles:', error);
     return [];
@@ -17,6 +18,8 @@ async function getPosts() {
 
 export default async function Home() {
   const posts = await getPosts();
+
+  console.log("Articles récupérés:", posts);
 
   if (posts.length === 0) {
     return (
