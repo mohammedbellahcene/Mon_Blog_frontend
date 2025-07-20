@@ -21,7 +21,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { data: session, status } = useSession({ required: false });
   const isConnected = status === 'authenticated';
-  const avatarUrl = session?.user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(session?.user?.name || session?.user?.email || 'U')}`;
+  const avatarUrl = session?.user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(session?.user?.name || session?.user?.email || 'U')}`;
 
   return (
     <Disclosure as="nav" className="bg-white shadow px-4 py-3">
